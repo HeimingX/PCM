@@ -91,15 +91,15 @@ total_steps = 0
 def main():
     global best_acc
     train_labeled_set, train_unlabeled_set, val_set, test_set, n_labels, tokenizer = get_data(
-        args.data_path, args.n_labeled, train_aug=args.train_aug, add_cls_sep=args.add_cls_sep, mixText_origin=False,
-        model=args.model, splited=args.local_machine, max_seq_len=args.max_seq_len)
+        args.data_path, args.n_labeled, unlabeled_per_class=args.un_labeled, train_aug=args.train_aug, add_cls_sep=args.add_cls_sep, 
+        mixText_origin=False, model=args.model, splited=args.local_machine, max_seq_len=args.max_seq_len)
     args.n_labels = n_labels
     labeled_trainloader = Data.DataLoader(dataset=train_labeled_set, batch_size=args.batch_size, shuffle=True,
                                           drop_last=True)
     unlabeled_trainloader = Data.DataLoader(dataset=train_unlabeled_set, batch_size=args.batch_size_u, shuffle=True,
                                             drop_last=True)
-    val_loader = Data.DataLoader(dataset=val_set, batch_size=64, shuffle=False)
-    test_loader = Data.DataLoader(dataset=test_set, batch_size=64, shuffle=False)
+    val_loader = Data.DataLoader(dataset=val_set, batch_size=32, shuffle=False)
+    test_loader = Data.DataLoader(dataset=test_set, batch_size=32, shuffle=False)
 
     cls_token_ids = None
 
@@ -166,8 +166,9 @@ def main():
     best_val_acc_loc = 0
     args.val_iteration = len(unlabeled_trainloader)
     for epoch in range(start_epoch, args.epochs):
-        ul_pl, ul_pl_logits = update_pl(train_unlabeled_set, model, cls_token_ids, epoch)
-        ul_pl_stats = (ul_pl, ul_pl_logits)
+        # ul_pl, ul_pl_logits = update_pl(train_unlabeled_set, model, cls_token_ids, epoch)
+        # ul_pl_stats = (ul_pl, ul_pl_logits)
+        ul_pl_stats = (None, None)
         train(labeled_trainloader, unlabeled_trainloader, model, optimizer, train_criterion, epoch,
               n_labels, args.train_aug, cls_token_ids, ul_pl_stats)
         # save model
@@ -197,9 +198,12 @@ def main():
 def update_pl(dataset, model, cls_token_ids, epoch):
     model.eval()
     num_ul = args.n_labels * args.un_labeled
-    ul_gt = torch.ones(num_ul).long().cuda() * -1
-    ul_pl = torch.ones(num_ul).long().cuda() * -1
-    ul_pl_logits = torch.zeros((num_ul, args.n_labels)).cuda()
+    # ul_gt = torch.ones(num_ul).long().cuda() * -1
+    # ul_pl = torch.ones(num_ul).long().cuda() * -1
+    # ul_pl_logits = torch.zeros((num_ul, args.n_labels)).cuda()
+    ul_gt = torch.ones(num_ul).long() * -1
+    ul_pl = torch.ones(num_ul).long() * -1
+    ul_pl_logits = torch.zeros((num_ul, args.n_labels))
     pos_idx = list()
     neg_idx = list()
     cls_idx = [list() for _ in range(args.n_labels)]
@@ -210,11 +214,11 @@ def update_pl(dataset, model, cls_token_ids, epoch):
             length_ori = length_ori.cuda()
             targets_u_ori = targets_u_ori.cuda()
 
-            ul_gt[idx_u] = targets_u_ori
+            ul_gt[idx_u] = targets_u_ori.cpu()
             orig_y_pred = model(inputs_ori, length_ori, use_cls_sep=args.add_cls_sep, probing_words_list=None)
 
             orig_y_pred = orig_y_pred / args.T
-            ul_pl_logits[idx_u] = orig_y_pred
+            ul_pl_logits[idx_u] = orig_y_pred.cpu()
 
             # generate pseudo-label mask: cond1
             targets_u = torch.softmax(orig_y_pred, dim=1)
@@ -237,7 +241,7 @@ def update_pl(dataset, model, cls_token_ids, epoch):
             loss_u_mask = loss_u_mask >= 1
             _pl = torch.ones(inputs_ori.size()[0]).long().cuda() * -1
             _pl[loss_u_mask] = pl_u_idx[loss_u_mask]
-            ul_pl[idx_u] = _pl
+            ul_pl[idx_u] = _pl.cpu()
             del _pl
 
         # balance the pos/neg pl
@@ -357,18 +361,22 @@ def train(labeled_trainloader, unlabeled_trainloader, model, optimizer,
         length_u, length_u2, length_ori = length_u.cuda(), length_u2.cuda(), length_ori.cuda()
         targets_u_ori = targets_u_ori.cuda()
 
-        all_inputs = torch.cat([inputs_x, inputs_u, inputs_u2], dim=0)
-        all_lengths = torch.cat([inputs_x_length, length_u, length_u2], dim=0)
-        outputs_all = model(all_inputs, all_lengths, use_cls_sep=args.add_cls_sep, probing_words_list=None)
-        outputs_x = outputs_all[:args.batch_size]
-        aug_y_pred = outputs_all[args.batch_size:args.batch_size + args.batch_size_u]
-        aug_y_pred2 = outputs_all[-args.batch_size_u:]
+        # all_inputs = torch.cat([inputs_x, inputs_u, inputs_u2], dim=0)
+        # all_lengths = torch.cat([inputs_x_length, length_u, length_u2], dim=0)
+        # outputs_all = model(all_inputs, all_lengths, use_cls_sep=args.add_cls_sep, probing_words_list=None)
+        # outputs_x = outputs_all[:args.batch_size]
+        # aug_y_pred = outputs_all[args.batch_size:args.batch_size + args.batch_size_u]
+        # aug_y_pred2 = outputs_all[-args.batch_size_u:]
+
+        outputs_x = model(inputs_x, inputs_x_length, use_cls_sep=args.add_cls_sep, probing_words_list=None)
+        aug_y_pred = model(inputs_u, length_u, use_cls_sep=args.add_cls_sep, probing_words_list=None)
+        aug_y_pred2 = model(inputs_u2, length_u2, use_cls_sep=args.add_cls_sep, probing_words_list=None)
 
         prob_logits_x, prob_logits_aug, prob_logits_aug2 = None, None, None
 
-        orig_y_pred = ul_pl_logits[idx_u]
+        orig_y_pred = ul_pl_logits[idx_u].cuda()
         prob_logits_orig = None
-        loss_u_mask = (ul_pl[idx_u] > -1).float()
+        loss_u_mask = (ul_pl[idx_u] > -1).float().cuda()
 
         loss = criterion(outputs_x=outputs_x, targets_x=targets_x, prob_logits_x=prob_logits_x,
                          outputs_u=(aug_y_pred, aug_y_pred2), targets_u=(orig_y_pred, prob_logits_orig),

@@ -14,41 +14,60 @@ import global_file
 logger = utils.logger
 
 TOKENS_SHOT = [
-    [734, 449, 430, 341, 312, 306, 229, 213, 205, 190, 137, 137, 106, 105, 103, 101, 95, 95, 87, 80, 80, 74, 66, 64, 63, 57, 54, 53, 52, 51, 47, 46, 46, 45, 43, 42, 41, 39, 39, 37, 35, 34, 34, 29, 29, 28, 26, 26, 26, 26, 25, 25, 25],
-    [360, 356, 263, 258, 258, 217, 198, 190, 181, 139, 138, 136, 136, 131, 131, 129, 128, 126, 121, 120, 120, 116, 113, 107, 101, 100, 98, 98, 94, 93, 81, 80, 80, 73, 73, 70, 70, 69, 68, 68, 67, 65, 65, 61, 60, 59, 58, 57, 54, 54, 54, 53, 53, 52, 52, 51, 51, 51, 50, 50, 49, 48, 47, 46, 46, 46, 45, 44, 44, 43, 43, 43],
-    [340, 157, 143, 109, 105, 95, 87, 81, 80, 66, 66, 64, 56, 55, 51, 51, 49, 49, 49, 46, 42, 41, 41, 38, 37, 35, 35, 33, 33, 33, 32, 32, 31, 31, 29, 29, 28, 28, 27, 26, 26, 25, 25, 24, 24, 23, 23, 22, 22, 21, 21, 20, 20, 20, 19, 19],
-    [151, 127, 126, 109, 103, 80, 80, 79, 52, 48, 48, 44, 43, 42, 41, 40, 40, 38, 38, 35, 35, 35, 33, 33, 33, 32, 31, 31, 30, 30, 30, 28, 28, 28, 27, 26, 25, 25, 24, 24, 24, 24, 22, 22, 22, 22, 21, 18],
-    [1287, 409, 393, 377, 366, 362, 339, 336, 332, 307, 286, 284, 279, 261, 244, 239, 230, 223, 222, 219, 217, 213, 206, 202, 197, 191, 182, 180, 178, 174, 172, 164, 160, 160, 154, 147, 145, 142, 140, 129, 129, 129, 128, 126, 124, 123, 122, 122, 120, 118, 118, 117, 117, 116, 115, 115, 115, 114, 112, 107, 106, 105, 104, 102, 101],
-    [366, 275, 215, 195, 183, 166, 165, 156, 155, 135, 131, 118, 117, 117, 113, 110, 109, 103, 97, 96, 90, 75, 69, 63, 62, 60, 57, 53, 52, 52, 51, 51, 50, 50, 49, 46, 42, 41, 36, 34, 31, 30, 30, 29, 28, 28, 28, 28, 27, 26, 25, 25, 25, 25, 23, 22, 22, 22],
-    [226, 116, 112, 107, 100, 77, 70, 65, 63, 60, 55, 54, 52, 50, 49, 44, 42, 42, 42, 38, 37, 34, 31, 31, 31, 31, 30, 28, 27, 26, 26, 26, 25, 25, 25, 24, 24, 24, 24, 22, 21, 21, 20, 20, 19, 19, 19, 18, 18, 17, 17, 17, 17, 17, 16, 16, 15, 15, 14, 14, 13, 12, 12, 12, 11, 10, 10, 10, 10, 10, 10],
-    [776, 435, 374, 199, 185, 169, 134, 127, 100, 94, 87, 85, 80, 78, 67, 67, 66, 64, 61, 57, 57, 57, 57, 55, 53, 49, 48, 45, 45, 44, 42, 41, 38, 36, 36, 36, 36, 36, 33, 31, 31, 30, 29, 29, 28, 28, 27, 26, 25, 25, 25, 24, 24, 24, 24, 23, 22, 21, 20, 20, 20],
-    [880, 405, 325, 308, 299, 191, 154, 148, 145, 134, 105, 84, 80, 79, 70, 64, 54, 41, 40, 38, 37, 36, 34, 32, 31, 29, 29, 29, 27, 27, 26, 25, 25, 24, 24, 24, 22, 21, 20, 19, 18, 18, 18, 17, 17, 17, 16, 15, 14],
-    [386, 252, 203, 179, 154, 147, 139, 131, 127, 122, 103, 102, 101, 101, 99, 96, 88, 85, 84, 81, 80, 75, 72, 69, 62, 60, 58, 58, 58, 56, 55, 55, 55, 54, 53, 53, 52, 52, 52, 50, 48, 46, 46, 45, 44, 44, 42, 42, 42, 41, 41, 41, 38, 37, 37, 37, 35, 35, 34, 32, 32, 32, 32, 31, 31, 30, 30, 29, 28, 28, 28, 27, 26, 25]
+    [734, 449, 430, 341, 312, 306, 229, 213, 205, 190, 137, 137, 106, 105, 103, 101, 95, 95, 87, 80, 80, 74, 66, 64, 63,
+     57, 54, 53, 52, 51, 47, 46, 46, 45, 43, 42, 41, 39, 39, 37, 35, 34, 34, 29, 29, 28, 26, 26, 26, 26, 25, 25, 25],
+    [360, 356, 263, 258, 258, 217, 198, 190, 181, 139, 138, 136, 136, 131, 131, 129, 128, 126, 121, 120, 120, 116, 113,
+     107, 101, 100, 98, 98, 94, 93, 81, 80, 80, 73, 73, 70, 70, 69, 68, 68, 67, 65, 65, 61, 60, 59, 58, 57, 54, 54, 54,
+     53, 53, 52, 52, 51, 51, 51, 50, 50, 49, 48, 47, 46, 46, 46, 45, 44, 44, 43, 43, 43],
+    [340, 157, 143, 109, 105, 95, 87, 81, 80, 66, 66, 64, 56, 55, 51, 51, 49, 49, 49, 46, 42, 41, 41, 38, 37, 35, 35,
+     33, 33, 33, 32, 32, 31, 31, 29, 29, 28, 28, 27, 26, 26, 25, 25, 24, 24, 23, 23, 22, 22, 21, 21, 20, 20, 20, 19,
+     19],
+    [151, 127, 126, 109, 103, 80, 80, 79, 52, 48, 48, 44, 43, 42, 41, 40, 40, 38, 38, 35, 35, 35, 33, 33, 33, 32, 31,
+     31, 30, 30, 30, 28, 28, 28, 27, 26, 25, 25, 24, 24, 24, 24, 22, 22, 22, 22, 21, 18],
+    [1287, 409, 393, 377, 366, 362, 339, 336, 332, 307, 286, 284, 279, 261, 244, 239, 230, 223, 222, 219, 217, 213, 206,
+     202, 197, 191, 182, 180, 178, 174, 172, 164, 160, 160, 154, 147, 145, 142, 140, 129, 129, 129, 128, 126, 124, 123,
+     122, 122, 120, 118, 118, 117, 117, 116, 115, 115, 115, 114, 112, 107, 106, 105, 104, 102, 101],
+    [366, 275, 215, 195, 183, 166, 165, 156, 155, 135, 131, 118, 117, 117, 113, 110, 109, 103, 97, 96, 90, 75, 69, 63,
+     62, 60, 57, 53, 52, 52, 51, 51, 50, 50, 49, 46, 42, 41, 36, 34, 31, 30, 30, 29, 28, 28, 28, 28, 27, 26, 25, 25, 25,
+     25, 23, 22, 22, 22],
+    [226, 116, 112, 107, 100, 77, 70, 65, 63, 60, 55, 54, 52, 50, 49, 44, 42, 42, 42, 38, 37, 34, 31, 31, 31, 31, 30,
+     28, 27, 26, 26, 26, 25, 25, 25, 24, 24, 24, 24, 22, 21, 21, 20, 20, 19, 19, 19, 18, 18, 17, 17, 17, 17, 17, 16, 16,
+     15, 15, 14, 14, 13, 12, 12, 12, 11, 10, 10, 10, 10, 10, 10],
+    [776, 435, 374, 199, 185, 169, 134, 127, 100, 94, 87, 85, 80, 78, 67, 67, 66, 64, 61, 57, 57, 57, 57, 55, 53, 49,
+     48, 45, 45, 44, 42, 41, 38, 36, 36, 36, 36, 36, 33, 31, 31, 30, 29, 29, 28, 28, 27, 26, 25, 25, 25, 24, 24, 24, 24,
+     23, 22, 21, 20, 20, 20],
+    [880, 405, 325, 308, 299, 191, 154, 148, 145, 134, 105, 84, 80, 79, 70, 64, 54, 41, 40, 38, 37, 36, 34, 32, 31, 29,
+     29, 29, 27, 27, 26, 25, 25, 24, 24, 24, 22, 21, 20, 19, 18, 18, 18, 17, 17, 17, 16, 15, 14],
+    [386, 252, 203, 179, 154, 147, 139, 131, 127, 122, 103, 102, 101, 101, 99, 96, 88, 85, 84, 81, 80, 75, 72, 69, 62,
+     60, 58, 58, 58, 56, 55, 55, 55, 54, 53, 53, 52, 52, 52, 50, 48, 46, 46, 45, 44, 44, 42, 42, 42, 41, 41, 41, 38, 37,
+     37, 37, 35, 35, 34, 32, 32, 32, 32, 31, 31, 30, 30, 29, 28, 28, 28, 27, 26, 25]
 ]
 
 
-def get_class_names(data_path):
+def get_class_names(data_path, sim_cls_name=False):
     if 'yahoo_answers' in data_path:
-        class_names = [['society', 'culture'],
-                       ['science', 'mathematics'],
-                       ['health'],
-                       ['education', 'reference'],
-                       ['computers', 'internet'],
-                       ['sports'],
-                       ['business', 'finance'],
-                       ['entertainment', 'music'],
-                       ['family', 'relationships'],
-                       ['politics', 'government']]
-        # YAHOOANSWERS_SIM_NAMES = [['community', 'civilization', 'customs'],
-        #                           ['discipline', 'knowledge', 'technique'],
-        #                           ['fitness', 'wellbeing', 'vigor'],
-        #                           ['schooling', 'discipline', 'recommendation'],
-        #                           ['laptop', 'website', 'network'],
-        #                           ['game', 'exercise', 'play'],
-        #                           ['trade', 'commerce', 'economy'],
-        #                           ['fun', 'songs', 'folk'],
-        #                           ['household', 'children', 'parents'],
-        #                           ['civics', 'authority', 'administration']]
+        if not sim_cls_name:
+            class_names = [['society', 'culture'],
+                           ['science', 'mathematics'],
+                           ['health'],
+                           ['education', 'reference'],
+                           ['computers', 'internet'],
+                           ['sports'],
+                           ['business', 'finance'],
+                           ['entertainment', 'music'],
+                           ['family', 'relationships'],
+                           ['politics', 'government']]
+        else:
+            class_names = [['community', 'civilization', 'customs'],
+                           ['discipline', 'knowledge', 'technique'],
+                           ['fitness', 'wellbeing', 'vigor'],
+                           ['schooling', 'discipline', 'recommendation'],
+                           ['laptop', 'website', 'network'],
+                           ['game', 'exercise', 'play'],
+                           ['trade', 'commerce', 'economy'],
+                           ['fun', 'songs', 'folk'],
+                           ['household', 'children', 'parents'],
+                           ['civics', 'authority', 'administration']]
         #
         # CLS_WISE_ATTENTED_TOKENS = [
         #     ['god', 'bible', 'religion', 'gay', 'church', 'jesus', 'religious', 'life', 'christian', 'christians',
@@ -179,11 +198,18 @@ class Translator:
     """
 
     def __init__(self, path, transform_type='BackTranslation'):
+        # # Pre-processed German data
+        # with open(path + 'de_1.pkl', 'rb') as f:
+        #     self.de = pickle.load(f)
+        # # Pre-processed Russian data
+        # with open(path + 'ru_1.pkl', 'rb') as f:
+        #     self.ru = pickle.load(f)
+        # full ul set
         # Pre-processed German data
-        with open(path + 'de_1.pkl', 'rb') as f:
+        with open(path + 'de_1_full.pkl', 'rb') as f:
             self.de = pickle.load(f)
         # Pre-processed Russian data
-        with open(path + 'ru_1.pkl', 'rb') as f:
+        with open(path + 'ru_1_full.pkl', 'rb') as f:
             self.ru = pickle.load(f)
 
     def __call__(self, ori, idx):
@@ -314,7 +340,7 @@ def train_val_split(labels, n_labeled_per_class, unlabeled_per_class, n_labels, 
             return train_pool[::-1]
         elif seed_l == 2:
             pool_size = len(train_pool)
-            return np.concatenate((train_pool[pool_size//2:], train_pool[:pool_size//2]))
+            return np.concatenate((train_pool[pool_size // 2:], train_pool[:pool_size // 2]))
         else:
             return train_pool
 
@@ -323,23 +349,28 @@ def train_val_split(labels, n_labeled_per_class, unlabeled_per_class, n_labels, 
         np.random.shuffle(idxs)
         if n_labels == 2:
             # IMDB
-            train_pool = np.concatenate((idxs[:500], idxs[5500:-2000]))
-            # train_pool = pseudo_shuffle(global_file.args.seed_l, train_pool)
-            train_labeled_idxs.extend(train_pool[n_labeled_per_class*seed:n_labeled_per_class*(seed+1)])
-            train_unlabeled_idxs.extend(idxs[500: 500 + 5000])
+            if unlabeled_per_class == 5000:
+                train_pool = np.concatenate((idxs[:500], idxs[5500:-2000]))
+                # train_pool = pseudo_shuffle(global_file.args.seed_l, train_pool)
+                train_labeled_idxs.extend(train_pool[n_labeled_per_class * seed:n_labeled_per_class * (seed + 1)])
+                train_unlabeled_idxs.extend(idxs[500: 500 + unlabeled_per_class])
+            else:
+                assert n_labeled_per_class == 20, 'IMDB NLAB=20, NUL=FULL, is implemented!'
+                train_labeled_idxs.extend(idxs[:20])
+                train_unlabeled_idxs.extend(idxs[20:])
             val_idxs.extend(idxs[-2000:])
         elif n_labels == 10:
             # DBPedia
             train_pool = np.concatenate((idxs[:500], idxs[10500:-2000]))
             # train_pool = pseudo_shuffle(global_file.args.seed_l, train_pool)
-            train_labeled_idxs.extend(train_pool[n_labeled_per_class*seed:n_labeled_per_class*(seed+1)])
+            train_labeled_idxs.extend(train_pool[n_labeled_per_class * seed:n_labeled_per_class * (seed + 1)])
             train_unlabeled_idxs.extend(idxs[500: 500 + unlabeled_per_class])
             val_idxs.extend(idxs[-2000:])
         else:
             # Yahoo/AG News
             train_pool = np.concatenate((idxs[:500], idxs[5500:-2000]))
             # train_pool = pseudo_shuffle(global_file.args.seed_l, train_pool)
-            train_labeled_idxs.extend(train_pool[n_labeled_per_class*seed:n_labeled_per_class*(seed+1)])
+            train_labeled_idxs.extend(train_pool[n_labeled_per_class * seed:n_labeled_per_class * (seed + 1)])
             train_unlabeled_idxs.extend(idxs[500: 500 + 5000])
             val_idxs.extend(idxs[-2000:])
     np.random.shuffle(train_labeled_idxs)
@@ -351,7 +382,8 @@ def train_val_split(labels, n_labeled_per_class, unlabeled_per_class, n_labels, 
 
 class loader_labeled(Dataset):
     # Data loader for labeled data
-    def __init__(self, dataset_text, dataset_label, tokenizer, max_seq_len, aug=False, add_cls_sep=False, mixText_origin=True):
+    def __init__(self, dataset_text, dataset_label, tokenizer, max_seq_len, aug=False, add_cls_sep=False,
+                 mixText_origin=True):
         self.tokenizer = tokenizer
         self.text = dataset_text
         self.labels = dataset_label
