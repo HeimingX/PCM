@@ -2,8 +2,8 @@
 
 This project contains the implementation of PCM for semi-supervised text classification, as presented in our paper
     
-> Progressive Class Semantic Matching for Semi-supervised Text Classification, 
-> Hai-Ming Xu, Lingqiao Liu and Ehsan Abbasnejad, 
+> Progressive Class Semantic Matching for Semi-supervised Text Classification,   
+> Hai-Ming Xu, Lingqiao Liu and Ehsan Abbasnejad,   
 > *To be appeared in NAACL 2022*
     
 The full paper is available at: [Open Review Link](https://openreview.net/forum?id=FitLLp-Jwa)
